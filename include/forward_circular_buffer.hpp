@@ -1,10 +1,14 @@
 #pragma once
 
 #include <algorithm>
-#include <concepts>
+#include <array>
+#include <cstddef>
 #include <iterator>
+#include <memory>
 #include <type_traits>
+#include <utility>
 
+#include "stddebug.hpp"
 #include "stdfunc.hpp"
 
 namespace {
@@ -46,7 +50,7 @@ struct forwardCircularBuffer {
         using iteratorCategory_t = std::random_access_iterator_tag;
 
         constexpr auto operator*() const -> T& {
-            return ( _data->_data.at( _data->logical_to_physical( _index ) ) );
+            return ( _data->_data.at( _data->logicalToPhysical( _index ) ) );
         }
 
         constexpr auto operator->() const -> T* {
@@ -166,7 +170,7 @@ struct forwardCircularBuffer {
         using iteratorCategory_t = std::random_access_iterator_tag;
 
         constexpr auto operator*() const -> const T& {
-            return ( _data->_data.at( _data->logical_to_physical( _index ) ) );
+            return ( _data->_data.at( _data->logicalToPhysical( _index ) ) );
         }
 
         constexpr auto operator->() const -> T* {
@@ -272,7 +276,7 @@ struct forwardCircularBuffer {
 
 protected:
     // logical -> physical index
-    [[nodiscard]] constexpr auto logical_to_physical( size_t _index ) const
+    [[nodiscard]] constexpr auto logicalToPhysical( size_t _index ) const
         -> size_t {
         requireInRange( _index );
 
@@ -372,26 +376,26 @@ public:
     constexpr auto operator[]( size_t _index ) -> T& {
         requireInRange( _index );
 
-        return ( _data[ logical_to_physical( _index ) ] );
+        return ( _data[ logicalToPhysical( _index ) ] );
     }
 
     [[nodiscard]]
     constexpr auto operator[]( size_t _index ) const -> const T& {
         requireInRange( _index );
 
-        return ( _data[ logical_to_physical( _index ) ] );
+        return ( _data[ logicalToPhysical( _index ) ] );
     }
 
     [[nodiscard]] constexpr auto at( size_t _index ) -> T& {
         requireInRange( _index );
 
-        return ( _data.at( logical_to_physical( _index ) ) );
+        return ( _data.at( logicalToPhysical( _index ) ) );
     }
 
     [[nodiscard]] constexpr auto at( size_t _index ) const -> const T& {
         requireInRange( _index );
 
-        return ( _data.at( logical_to_physical( _index ) ) );
+        return ( _data.at( logicalToPhysical( _index ) ) );
     }
 
     [[nodiscard]]
@@ -448,7 +452,7 @@ public:
 
         const size_t l_currentBufferIndex = _currentBufferIndex;
         const size_t l_nextBufferIndex =
-            logical_to_physical( l_currentBufferIndex + 1 );
+            logicalToPhysical( l_currentBufferIndex + 1 );
 
         if constexpr ( std::is_assignable_v< T&, T > ) {
             // simple case: assign into existing slot
@@ -480,7 +484,7 @@ public:
 
         const size_t l_currentBufferIndex = _currentBufferIndex;
         const size_t l_nextBufferIndex =
-            logical_to_physical( l_currentBufferIndex + 1 );
+            logicalToPhysical( l_currentBufferIndex + 1 );
 
         if constexpr ( std::is_assignable_v< T&, T > ) {
             _data.at( l_currentBufferIndex ) = std::move( _value );
@@ -513,7 +517,7 @@ public:
 
         const size_t l_currentBufferIndex = _currentBufferIndex;
         const size_t l_nextBufferIndex =
-            logical_to_physical( l_currentBufferIndex + 1 );
+            logicalToPhysical( l_currentBufferIndex + 1 );
 
         if constexpr ( std::is_assignable_v< T&, T > ) {
             // If T supports assignment from a temporary, build a temporary and
@@ -564,7 +568,7 @@ public:
         // TODO: Improve
         _previousBufferIndex =
             ( ( l_removedIndex > 0 )
-                  ? ( logical_to_physical( l_removedIndex - 1 ) )
+                  ? ( logicalToPhysical( l_removedIndex - 1 ) )
                   : ( 0 ) );
         _elementAmount--;
 

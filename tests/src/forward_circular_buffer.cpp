@@ -1,5 +1,7 @@
 #include "forward_circular_buffer.hpp"
 
+#include <vector>
+
 #include "test.hpp"
 
 using namespace fcb;
