@@ -38,7 +38,7 @@ struct forwardCircularBuffer {
     // Iterators (logical order: oldest -> newest)
     struct iterator {
         using difference_type = std::ptrdiff_t;
-        using iterator_category = std::random_access_iterator_tag;
+        using iterator_category = std::contiguous_iterator_tag;
         using pointer = T*;
         using reference = T&;
         using value_type = T;
@@ -47,7 +47,7 @@ struct forwardCircularBuffer {
             : _data( _data ), _index( _index ) {}
         iterator() = default;
 
-        using iteratorCategory_t = std::random_access_iterator_tag;
+        using iteratorCategory_t = std::contiguous_iterator_tag;
 
         constexpr auto operator*() const -> T& {
             return ( _data->_data.at( _data->logicalToPhysical( _index ) ) );
@@ -155,7 +155,7 @@ struct forwardCircularBuffer {
 
     struct const_iterator {
         using difference_type = std::ptrdiff_t;
-        using iterator_category = std::random_access_iterator_tag;
+        using iterator_category = std::contiguous_iterator_tag;
         using pointer = const T*;
         using reference = const T&;
         using value_type = const T;
@@ -167,7 +167,7 @@ struct forwardCircularBuffer {
             : _data( _iterator._data ), _index( _iterator._index ) {}
         const_iterator() = default;
 
-        using iteratorCategory_t = std::random_access_iterator_tag;
+        using iteratorCategory_t = std::contiguous_iterator_tag;
 
         constexpr auto operator*() const -> const T& {
             return ( _data->_data.at( _data->logicalToPhysical( _index ) ) );
@@ -457,6 +457,7 @@ public:
         if constexpr ( std::is_assignable_v< T&, T > ) {
             // simple case: assign into existing slot
             _data.at( l_currentBufferIndex ) = _value;
+
         } else {
             // fallback: destroy existing element and construct in-place
             static_assert( std::is_default_constructible_v< T >,
@@ -488,6 +489,7 @@ public:
 
         if constexpr ( std::is_assignable_v< T&, T > ) {
             _data.at( l_currentBufferIndex ) = std::move( _value );
+
         } else {
             static_assert( std::is_default_constructible_v< T >,
                            "T must be assignable or default-constructible to "
@@ -524,6 +526,7 @@ public:
             // assign
             _data.at( l_currentBufferIndex ) =
                 T( std::forward< Arguments >( _arguments )... );
+
         } else {
             static_assert(
                 std::is_default_constructible_v< T >,
