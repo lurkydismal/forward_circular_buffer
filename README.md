@@ -66,7 +66,7 @@ auto main() -> int {
     l_buffer.push_back( 2 );
     l_buffer.push_back( 3 );
 
-    for (auto value : l_buffer) {
+    for (auto _value : l_buffer) {
         std::print( "{} ", _value ); // Output: 1 2 3
     }
 
